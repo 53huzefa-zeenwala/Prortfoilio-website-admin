@@ -1,8 +1,9 @@
 import React from 'react'
 
-export default function Loader() {
+export default function Loader({bgFull}) {
+    const bgOpacity = bgFull ? "bg-opacity-100" : "bg-opacity-70"
     return (
-        <div className='fixed top-0 left-0 right-0 bottom-0 flex justify-center items-center flex-col gap-8 bg-black bg-opacity-70 z-50'>
+        <div className={`${bgOpacity} fixed top-0 left-0 right-0 bottom-0 flex justify-center items-center flex-col gap-8 bg-black z-50`}>
             <div>
                 <div role="status">
                     <svg className="mr-2 w-10 h-10 text-gray-200 animate-spin dark:text-gray-600 dark:fill-teal-300 fill-teal-600" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">

@@ -11,7 +11,7 @@ export default function PrimaryButton({ text, color, isLoading, isSuccess, setIs
     }, [isSuccess])
 
     return (
-        <button disabled={isLoading || isSuccess} className={`${isSuccess ? "bg-green-200" : "bg-blue-600 hover:bg-blue-500"} px-6 py-2 rounded flex justify-center items-center transition-colors disabled:cursor-not-allowed shadow-lg shadow-slate-900/50`} type="submit">
+        <button disabled={isLoading || isSuccess} className={`${isSuccess ? "bg-green-200" : "bg-blue-600 hover:bg-blue-500"} px-6 py-2 rounded flex justify-center items-center transition-colors disabled:cursor-not-allowed shadow-lg shadow-slate-900/50 min-w-[10rem] min-h-[3rem]`} type="submit">
             {!isLoading && !isSuccess && <span className='text-base capitalize font-medium'>{text}</span>}
             {isLoading && (
                 <div role="status">

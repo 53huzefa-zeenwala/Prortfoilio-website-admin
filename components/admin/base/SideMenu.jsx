@@ -1,16 +1,30 @@
+import Loader from '@/components/Loader'
 import { useStateContext } from '@/context/Statecontext'
+import { auth } from '@/firebase'
+import { signOut } from 'firebase/auth'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import React from 'react'
+import React, { useState } from 'react'
 
 export default function SideMenu() {
     const { pathname, replace } = useRouter()
-    const { adminMenu, setAdminMenu } = useStateContext()
+    const { adminMenu, setAdminMenu, setLoading } = useStateContext()
     function checkBackgroundAndColor(url) {
         if (pathname == url) {
             return "bg-teal-400 text-black"
         }
         return "text-gray-400"
+    }
+    const handleSignOut = async () => {
+        try {
+            setLoading(true)
+            await signOut(auth)
+            replace('/admin/login')
+            setLoading(false)
+        } catch (error) {
+            console.log(error)
+            setAlert({ isShow: true, duration: 3000, message: error.response?.data?.message || error.message, type: "error" })
+        }
     }
     return (
         <div style={{ transform: adminMenu ? "translateX(0)" : "translateX(-100%)", boxShadow: "rgb(0 0 0 / 30%) 5px -1px 12px 0px" }} className="flex h-screen flex-col justify-between border-r border-slate-800 bg-slate-900/70 w-64 fixed top-0 left-0 bottom-0 transition-transform duration-500 z-40  backdrop-blur-sm rounded-3xl rounded-l-none">
@@ -208,7 +222,24 @@ export default function SideMenu() {
                     />
                 </svg>
             </button>
-
+            <div className="sticky inset-x-0 bottom-0 border-t border-gray-100 font-semibold">
+                <button onClick={handleSignOut} className="flex items-center gap-2 px-4 py-3 pl-[50%] hover:bg-teal-200 w-full  hover:text-gray-700 text-gray-300 transition-colors">
+                    Logout
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-5 w-5 stroke-current transition-[stroke]"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth="2"
+                    >
+                        <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                        />
+                    </svg>
+                </button>
+            </div>
         </div>
     )
 }

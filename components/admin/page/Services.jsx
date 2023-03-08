@@ -44,9 +44,9 @@ function Services() {
                     </form>
                 </Modal>
                 <ul className='w-full pt-4 flex flex-wrap gap-8 justify-center md:justify-start md:px-8'>
-                    <li className='flex cursor-pointer flex-col bg-gray-700 rounded-xl overflow-hidden items-end pb-2 max-w-sm'>
+                    <li className='flex cursor-pointer flex-col bg-gray-700 rounded-xl overflow-hidden items-end pb-2 max-w-[16rem]'>
                         <div className='w-full flex flex-col'>
-                            <span className="relative h-36 w-full bg-gray-900">
+                            <span className="relative w-full bg-gray-900 aspect-square">
                                 <Image src="/sociallink.jpg" alt="Media Link" fill="object-fit" />
                             </span>
                             <div className='flex flex-col justify-center px-4 pt-2'>
@@ -58,20 +58,21 @@ function Services() {
                             Delete
                         </button>
                     </li>
-                    <li className='flex cursor-pointer flex-col bg-gray-700 rounded-xl overflow-hidden items-end pb-2 max-w-sm'>
+                    <li className='flex cursor-pointer flex-col bg-gray-700 rounded-xl overflow-hidden items-end pb-2 max-w-[16rem]'>
                         <div className='w-full flex flex-col'>
-                            <span className="relative h-36 w-full bg-gray-900">
+                            <span className="relative w-full bg-gray-900 aspect-square">
                                 <Image src="/sociallink.jpg" alt="Media Link" fill="object-fit" />
                             </span>
                             <div className='flex flex-col justify-center px-4 pt-2'>
                                 <span className='font-medium text-lg'>Web Development</span>
-                                <p className='text-sm text-gray-300'>We develop small eCommerce, portfolios, blogs, etc types of websites for clients.</p>
+                                <p className='text-sm text-gray-300 font-workSans'>We develop small eCommerce, portfolios, blogs, etc types of websites for clients.</p>
                             </div>
                         </div>
                         <button className='font-medium text-red-500 px-4'>
                             Delete
                         </button>
                     </li>
+                
                 </ul>
                 <button onClick={() => setIsOpen(true)}>Open</button>
             </div>
