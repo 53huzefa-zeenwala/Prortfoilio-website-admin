@@ -1,80 +1,142 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Header from '../base/Header'
 import Textarea from '../base/Textarea'
 import Image from 'next/image'
 import PrimaryInput from '../base/PrimaryInput'
 import Modal from '../base/Modal'
 import PrimaryButton from '../base/PrimaryButton'
+import ImageInput from '../base/ImageInput'
+import { useStateContext } from '@/context/Statecontext'
+import getDocumentCount from '@/firebase/getDocumentCount'
+import addDocument from '@/firebase/addDocument'
+import updateDocument from '@/firebase/updateDocument'
+import getDocuments from '@/firebase/getDocuments'
+import DragAndDropParent from '../base/DragAndDropParent'
+import { Draggable } from 'react-beautiful-dnd'
 
 function Services() {
+    const DOCNAME = "service"
+    const { currentUser, setAlert, setLoading, setDeleteDocument, deleteDocument } = useStateContext()
     const [isOpen, setIsOpen] = useState(false)
-    const [values, setValues] = useState({
+    const initialProp = {
         serviceName: "",
         doc: "",
         image: ""
-    })
+    }
+    const [values, setValues] = useState(initialProp)
     const [isLoading, setIsLoading] = useState(false)
     const [isSuccess, setIsSuccess] = useState(false)
+    const [items, setItems] = useState([])
+    const handleOnSubmit = async e => {
+        e.preventDefault()
+        if (!currentUser) {
+            setIsOpen({ type: "", show: false })
+            return
+        }
+        setIsLoading(true)
+        try {
+            const data = {
+                index: values.index || (await getDocumentCount(DOCNAME) + 1),
+                serviceName: values.serviceName,
+                doc: values.doc,
+                image: values.image
+            }
+            const res = isOpen.type === 'new' ? await addDocument(DOCNAME, data) : await updateDocument(DOCNAME, data, isOpen.id)
+
+            setAlert({ isShow: true, duration: 3000, message: res, type: "success" })
+            setIsOpen({
+                type: "",
+                show: false
+            })
+            setIsSuccess(true)
+            setValues(initialProp)
+        } catch (error) {
+            setAlert({ isShow: true, duration: 3000, message: error.message, type: "error" })
+        }
+        setIsLoading(false)
+    }
+    useEffect(() => {
+        async function fetchDocuments() {
+            setLoading(true)
+            const documents = await getDocuments(DOCNAME);
+            setItems(documents)
+            setLoading(false)
+        }
+        !deleteDocument.show || !isLoading ? fetchDocuments() : "";
+    }, [isLoading, deleteDocument.show])
     return (
-        <main className='px-4 pt-6 flex'>
+        <main className='px-4 py-6 flex'>
             <div className="w-full">
                 <Header image="/servicespage.png" heading="Services" detail="Services you provide." />
-                <Modal {...{ isOpen, setIsOpen, size: "md", heading: "Add Media Link" }}>
-                    <form className="flex flex-col justify-center w-full">
-                        <label htmlFor="mediaName" className='text-lg font-medium text-gray-400'>Service name</label>
+                <Modal {...{ isOpen, setIsOpen, size: "md", heading: `${isOpen.type === "new" ? "Add New" : "Update"} Service` }}>
+                    <form className="flex flex-col justify-center w-full" onSubmit={handleOnSubmit}>
+                        <label htmlFor="serviceName" className='text-lg font-medium text-gray-400'>Service name</label>
                         <PrimaryInput {...{ setValues, values, name: "serviceName", placeholder: "Name", isRequired: false }} />
-                        <label htmlFor="mediaName" className='text-lg font-medium text-gray-400'>Description</label>
+                        <label htmlFor="doc" className='text-lg font-medium text-gray-400'>Description</label>
                         <Textarea {...{ setValues, values, name: "doc", placeholder: "Description", isRequired: false }} />
-                        <div className='flex py-2 gap-2'>
-                            <input type="file" accept='image/*' className='sr-only' />
-                            <span className="relative h-12 bg-blue-200 w-24 rounded overflow-hidden">
-                                <Image src="/boy-512.webp" alt="Social media Icon" fill="object-fit" />
-                            </span>
-                            <button type='button' className='bg-blue-200 text-gray-700 rounded px-4 w-full font-medium hover:bg-blue-300 shadow-slate-900/50 justify-center py-2 items-center transition-colors disabled:bg-blue-400 disabled:cursor-not-allowed shadow-lg flex gap-2 outline-none' >
-                                <svg className='h-7 stroke-current' viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M13.5 12C13.5 15.18 10.93 17.75 7.75 17.75C4.57 17.75 2 15.18 2 12C2 8.82 4.57 6.25 7.75 6.25" stroke="inherit" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                                    <path d="M10 12C10 8.69 12.69 6 16 6C19.31 6 22 8.69 22 12C22 15.31 19.31 18 16 18" stroke="inherit" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                                </svg>
-                                Add Image</button>
-                        </div>
+                        <ImageInput {...{ setValues, values }} />
                         <div className="py-2 flex justify-end gap-4 font-medium">
-                            <button type='button' className='text-gray-300 hover:text-gray-200' onClick={() => setIsOpen(false)}>Close</button>
-                            <PrimaryButton {...{ isLoading, setIsSuccess, isSuccess, text: "Add Media" }} />
+                            <button type='button' className='text-gray-300 hover:text-gray-200' onClick={() => setIsOpen({ show: false })}>Close</button>
+                            <PrimaryButton {...{ isLoading, setIsSuccess, isSuccess, text: isOpen.type === "new" ? "Add Service" : "Update Service" }} />
                         </div>
                     </form>
                 </Modal>
-                <ul className='w-full pt-4 flex flex-wrap gap-8 justify-center md:justify-start md:px-8'>
-                    <li className='flex cursor-pointer flex-col bg-gray-700 rounded-xl overflow-hidden items-end pb-2 max-w-[16rem]'>
-                        <div className='w-full flex flex-col'>
-                            <span className="relative w-full bg-gray-900 aspect-square">
-                                <Image src="/sociallink.jpg" alt="Media Link" fill="object-fit" />
-                            </span>
-                            <div className='flex flex-col justify-center px-4 pt-2'>
-                                <span className='font-medium text-lg'>Web Development</span>
-                                <p className='text-sm text-gray-300 font-workSans'>We develop small eCommerce, portfolios, blogs, etc types of websites for clients.</p>
-                            </div>
-                        </div>
-                        <button className='font-medium text-red-500 px-4'>
-                            Delete
-                        </button>
-                    </li>
-                    <li className='flex cursor-pointer flex-col bg-gray-700 rounded-xl overflow-hidden items-end pb-2 max-w-[16rem]'>
-                        <div className='w-full flex flex-col'>
-                            <span className="relative w-full bg-gray-900 aspect-square">
-                                <Image src="/sociallink.jpg" alt="Media Link" fill="object-fit" />
-                            </span>
-                            <div className='flex flex-col justify-center px-4 pt-2'>
-                                <span className='font-medium text-lg'>Web Development</span>
-                                <p className='text-sm text-gray-300 font-workSans'>We develop small eCommerce, portfolios, blogs, etc types of websites for clients.</p>
-                            </div>
-                        </div>
-                        <button className='font-medium text-red-500 px-4'>
-                            Delete
-                        </button>
-                    </li>
-                
-                </ul>
-                <button onClick={() => setIsOpen(true)}>Open</button>
+                <div className='w-full flex justify-end'>
+                    <button className='px-4 py-2 rounded font-medium text-gray-300 bg-gray-600 hover:bg-gray-500 transition-colors shadow-lg shadow-slate-900/50 capitalize' onClick={() => {
+                        setIsOpen({
+                            type: "new",
+                            show: true
+                        })
+                        setValues(initialProp)
+                    }}>New Service</button>
+                </div>
+                {items.length !== 0 ? (
+                    <DragAndDropParent {...{ docName: DOCNAME, setItems, items, divClasses: "w-full pt-4 flex flex-wrap gap-8 justify-center md:justify-start md:px-8" }}>
+                        {items.map((doc, i) => (
+                            <Draggable key={doc.id} draggableId={doc.id} index={i} className="">
+                                {(provided, snapshot) => (
+                                    <li {...provided.draggableProps}
+                                        ref={provided.innerRef} className='hoverTag sm:h-[10rem] h-32 max-w-[30rem] sm:mr-10 w-full relative'>
+                                        <span {...provided.dragHandleProps} className='absolute bg-teal-100 hover:bg-teal-200 cursor-grab right-2 dragButton p-1 h-full rounded-lg rounded-l-none transition-[right] flex justify-center items-center drop-shadow-xl' data-drag={snapshot.isDragging}>
+                                            <svg xmlns="http://www.w3.org/2000/svg" className='w-4 h-4' viewBox="0 0 16 16" version="1.1" fill="none" stroke="#000000" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5">
+                                                <circle cy="2.5" cx="5.5" r=".75" />
+                                                <circle cy="8" cx="5.5" r=".75" />
+                                                <circle cy="13.5" cx="5.5" r=".75" />
+                                                <circle cy="2.5" cx="10.4957" r=".75" />
+                                                <circle cy="8" cx="10.4957" r=".75" />
+                                                <circle cy="13.5" cx="10.4957" r=".75" />
+                                            </svg>
+                                        </span>
+                                        <div className='w-full h-full flex bg-gray-700'>
+                                            <span className="relative h-full bg-gray-400 aspect-square"
+                                                onClick={() => {
+                                                    const newDoc = { ...doc }
+                                                    delete newDoc.id
+                                                    setValues(newDoc)
+                                                    setIsOpen({ type: "update", show: true, id: doc.id })
+                                                }}>
+                                                <Image src={doc.image} alt={doc.serviceName} fill="object-fit" />
+                                            </span>
+                                            <div className='flex flex-col px-4 pt-2 justify-between bg-gray-700 z-10'>
+                                                <span className='font-medium sm:text-lg'>{doc.serviceName}</span>
+                                                <p className='sm:text-sm text-xs text-gray-300 font-workSans'>{doc.doc}</p>
+                                                <div className='w-full flex justify-end pb-2'>
+                                                    <button className='font-medium text-red-500 px-4'  onClick={() => setDeleteDocument({show: true, docId: doc.id, docName: DOCNAME, docImages: [doc.image]})} >
+                                                        Delete
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                )}
+                            </Draggable>
+                        ))}
+                    </DragAndDropParent>
+                ) : (
+                    <h4 className="text-xl font-semibold">
+                        No results found
+                    </h4>
+                )}
             </div>
         </main>
     )

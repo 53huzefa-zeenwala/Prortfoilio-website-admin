@@ -11,6 +11,11 @@ export const StateContext = ({ children }) => {
     message: "",
     timeout: 3000,
   });
+  const [deleteDocument, setDeleteDocument] = useState({
+    show: false,
+    docId: "",
+    docName: ""
+  })
   const [adminMenu, setAdminMenu] = useState(false);
   const [userLoading, setUserLoading] = useState(true);
   const [userProfileData, setUserProfileData] = useState(null);
@@ -45,7 +50,9 @@ export const StateContext = ({ children }) => {
         userProfileData,
         currentUser,
         loading,
-        setLoading
+        setLoading,
+        setDeleteDocument,
+        deleteDocument
       }}
     >
       {children}

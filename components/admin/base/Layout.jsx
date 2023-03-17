@@ -5,15 +5,15 @@ import { Work_Sans } from 'next/font/google';
 import { useStateContext } from '@/context/Statecontext';
 import Loader from '@/components/Loader';
 import { useRouter } from 'next/router';
+import DeleteDocumentModal from './DeleteDocumentModal';
 
 const workSans = Work_Sans({ subsets: ["latin"], weight: ["100", "200", "300", "400", "600", "700", "800", "900"], variable: "--font-workSans", style: ['normal'] });
 
 function Layout({ children }) {
   const { userLoading, userProfileData, currentUser, loading } = useStateContext()
   const { push } = useRouter()
-  console.log(userLoading, userProfileData, currentUser)
   if (userLoading && currentUser === null) {
-    return <Loader />
+    return <Loader bgFull={true} />
   }
   if (!userLoading && currentUser === undefined) {
     push('/admin/login')
@@ -27,10 +27,10 @@ function Layout({ children }) {
   }
   return (
     <div className={`${workSans.variable} font-workSans bg-slate-800 min-h-screen text-slate-100 relative`}>
-      {userLoading && currentUser === null && <Loader bgFull={true} />}
       {loading && <Loader />}
       <Navbar />
       <SideMenu />
+      <DeleteDocumentModal />
       {children}
     </div>
   )

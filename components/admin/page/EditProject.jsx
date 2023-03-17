@@ -1,20 +1,13 @@
 import { useStateContext } from '@/context/Statecontext'
-import addDocument from '@/firebase/addDocument'
-import getDocumentCount from '@/firebase/getDocumentCount'
-import React, { useState } from 'react'
+import getDocument from '@/firebase/getDocument'
+import updateDocument from '@/firebase/updateDocument'
+import { useRouter } from 'next/router'
+import React, { useEffect, useState } from 'react'
 import Header from '../base/Header'
-import InputSection from '../base/InputSection'
-import ListedImageInput from '../base/ListedImageInput'
-import ListedInput from '../base/ListedInput'
-import PrimaryButton from '../base/PrimaryButton'
-import PrimaryInput from '../base/PrimaryInput'
 import ProjectForm from '../base/ProjectForm'
 import SectionLink from '../base/SectionLink'
-import SelectInput from '../base/SelectInput'
-import Textarea from '../base/Textarea'
-import TextEditor from '../base/TextEditor'
 
-function AddProject() {
+function EditProject() {
     const DOCNAME = "projects"
     const { setLoading, setAlert, currentUser } = useStateContext()
     const initialProp = {
@@ -36,6 +29,8 @@ function AddProject() {
     const [isLoading, setIsLoading] = useState(false)
     const [isSuccess, setIsSuccess] = useState(false)
     const [description, setDescription] = useState("")
+    const { query, replace } = useRouter()
+    const { id } = query;
     const handleOnSubmit = async e => {
         e.preventDefault()
         if (!currentUser) {
@@ -43,17 +38,31 @@ function AddProject() {
         }
         setIsLoading(true)
         try {
-            const data = { ...values, description, index: await getDocumentCount(DOCNAME) + 1 }
-            await addDocument(DOCNAME, data)
-            setAlert({ isShow: true, duration: 3000, message: "Successfully created", type: "success" })
+            const data = { ...values, description}
+            await updateDocument(DOCNAME, data, id)
+            setAlert({ isShow: true, duration: 3000, message: "Successfully Updated", type: "success" })
             setIsSuccess(true)
-            setValues(initialProp)
-            setDescription("")
         } catch (error) {
             setAlert({ isShow: true, duration: 3000, message: error.message, type: "error" })
         }
         setIsLoading(false)
     }
+    useEffect(() => {
+        async function fetchDocuments() {
+            setLoading(true)
+            const document = await getDocument(DOCNAME, id);
+            if (document === "no data") {
+                setAlert({ isShow: true, duration: 3000, message: "No data found check url", type: "error" })
+                replace("/admin/projects")
+            } else {
+                setLoading(false)
+                const {id, description, ...data} = document
+                setDescription(description)
+                setValues(data)
+            }
+        }
+        fetchDocuments()
+    }, [])
     return (
         <main className='px-4 pt-6 flex'>
             <ul className='hidden md:block w-48 pt-20 font-medium pr-8'>
@@ -68,11 +77,11 @@ function AddProject() {
                 <SectionLink id="teamUpWith" name="Team Up With" />
             </ul>
             <div className="w-full">
-                <Header heading="New Project" detail="Add your new project and detail about it." image="/newproject.png" />
-                <ProjectForm {...{handleOnSubmit, isLoading, isSuccess, setIsSuccess, values, setValues, setDescription, description}} />
+                <Header heading="Edit Project" detail="Edit your project and detail about it." image="/editproject.jfif" />
+                <ProjectForm {...{ handleOnSubmit, isLoading, isSuccess, setIsSuccess, values, setValues, setDescription, description, text: "Update Project" }} />
             </div>
         </main>
     )
 }
 
-export default AddProject
+export default EditProject

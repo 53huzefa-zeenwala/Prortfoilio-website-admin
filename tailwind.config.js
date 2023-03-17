@@ -1,3 +1,4 @@
+const defaultTheme = require('tailwindcss/defaultTheme')
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
@@ -9,10 +10,14 @@ module.exports = {
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
+    screens: {
+      xs: "330px",
+      ...defaultTheme.screens,
+    },
     extend: {
       fontFamily: {
-        workSans: ["var(--font-workSans)"]
-      }
+        workSans: ["var(--font-workSans)"],
+      },
     },
   },
   plugins: [],
