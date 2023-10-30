@@ -10,7 +10,7 @@ export default function Navbar() {
   return (
     <div className="h-20 relative bg-slate-800">
       <div className='w-full h-12 md:z-40'>
-        <header className="absolute w-full shadow-md shadow-[#414141b3] transition md:h-20 h-16">
+        <header className="absolute w-full shadow-md shadow-[#414141b3] transition md:h-20 h-16 capitalize">
           <nav className="w-full m-auto lg:px-20">
             <div id="Navbar" className="relative flex flex-wrap items-center justify-between  navbarAnimate md:bg-transparent h-0">
               <div className="relative z-30 w-full px-6 md:px-0  flex items-center justify-between md:w-auto bg-slate-800">
@@ -23,7 +23,7 @@ export default function Navbar() {
                 </div>
               </div>
 
-              <div data-isopen={open} className={"w-full px-6 bg-slate-800 md:w-[45%] md:px-0 lg:bg-transparent z-10 menuNavbar shadow-md shadow-[#414141b3] md:shadow-none -translate-y-full md:translate-y-0 md:flex md:justify-center"}>
+              <div data-isopen={open} className={"w-full px-6 md:w-[45%] md:px-0 lg:bg-transparent z-20 menuNavbar shadow-md shadow-[#414141b3] md:shadow-none -translate-y-full md:translate-y-0 md:flex md:justify-center bg-slate-700 md:bg-none"}>
                 <ul className="py-4 text-lg tracking-wide md:flex md:space-x-8 md:py-0">
                   <Link className={pathname === "/" ? "active headerLink" : "headerLink"} onClick={()=> setOpen(false)} href="/" >
                       HOME
@@ -33,7 +33,7 @@ export default function Navbar() {
                   </Link>
 
                   <Link  className={pathname === "/contact" ? "active headerLink" : "headerLink"} onClick={()=> setOpen(false)} href="/contact" >
-                      Contact
+                      CONTACT
                   </Link>
 
                 </ul>

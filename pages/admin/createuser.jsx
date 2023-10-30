@@ -2,7 +2,7 @@ import Layout from '@/components/admin/base/Layout'
 import CreateUser from '@/components/admin/page/CreateUser'
 import React from 'react'
 
-function createuserPage() {
+function createUserPage() {
   return (
     <Layout>
         <CreateUser />
@@ -10,4 +10,4 @@ function createuserPage() {
   )
 }
 
-export default createuserPage
+export default createUserPage
